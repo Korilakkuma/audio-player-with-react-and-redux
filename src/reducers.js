@@ -1,46 +1,109 @@
-const initState = {
-    src        : '',
-    paused     : true,
-    isMute     : false,
-    isLoop     : false,
-    isSeeking  : false,
-    currentTime: 0,
-    duration   : 0,
-    volume     : 0.5,
-    rate       : 1.0
-};
+import { combineReducers } from 'redux';
 
-function reducer(state = initState, action) {
+function src(state = '', action) {
     switch (action.type) {
         case 'CHANGE':
-            return Object.assign({}, state, { src: action.src, paused: false, currentTime: 0 });
-        case 'PLAY':
-            return Object.assign({}, state, { paused: false });
-        case 'PAUSE':
-            return Object.assign({}, state, { paused: true });
-        case 'STOP':
-            return Object.assign({}, state, { paused: true, currentTime: 0 });
-        case 'MUTE':
-            return Object.assign({}, state, { isMute: !state.isMute });
-        case 'LOOP':
-            return Object.assign({}, state, { isLoop: !state.isLoop });
-        case 'TIME_UPDATE':
-            return Object.assign({}, state, { currentTime: action.currentTime });
-        case 'SEEKING':
-            return Object.assign({}, state, { currentTime: action.currentTime, isSeeking: true });
-        case 'SEEKED':
-            return Object.assign({}, state, { isSeeking: false });
-        case 'ENDED':
-            return Object.assign({}, state, { paused: true });
-        case 'DURATION_CHANGE':
-            return Object.assign({}, state, { duration: action.duration });
-        case 'VOLUME_CHANGE':
-            return Object.assign({}, state, { volume: action.volume });
-        case 'RATE_CHANGE':
-            return Object.assign({}, state, { rate: action.rate });
+            return action.src;
         default:
             return state;
     }
 }
 
-export default reducer;
+function paused(state = true, action) {
+    switch (action.type) {
+        case 'PLAY'  :
+        case 'CHANGE':
+            return false;
+        case 'PAUSE':
+            return true;
+        case 'STOP':
+            return true;
+        case 'ENDED':
+            return true;
+        default:
+            return state;
+    }
+}
+
+function isMute(state = false, action) {
+    switch (action.type) {
+        case 'MUTE':
+            return !action.state;
+        default:
+            return state;
+    }
+}
+
+function isLoop(state = false, action) {
+    switch (action.type) {
+        case 'LOOP':
+            return !action.state;
+        default:
+            return state;
+    }
+}
+
+function isSeeking(state = false, action) {
+    switch (action.type) {
+        case 'SEEKING':
+            return true
+        case 'SEEKED':
+            return false;
+        default:
+            return state;
+    }
+}
+
+function currentTime(state = 0, action) {
+    switch (action.type) {
+        case 'CHANGE':
+        case 'STOP'  :
+            return 0;
+        case 'TIME_UPDATE':
+        case 'SEEKING'    :
+            return action.currentTime
+        default:
+            return state;
+    }
+}
+
+function duration(state = 0, action) {
+    switch (action.type) {
+        case 'DURATION_CHANGE':
+            return action.duration;
+        default:
+            return state;
+    }
+}
+
+function volume(state = 0.5, action) {
+    switch (action.type) {
+        case 'VOLUME_CHANGE':
+            return action.volume;
+        default:
+            return state;
+    }
+}
+
+function rate(state = 1, action) {
+    switch (action.type) {
+        case 'RATE_CHANGE':
+            return action.rate;
+        default:
+            return state;
+    }
+}
+
+const reducers = combineReducers({
+    src,
+    paused,
+    isMute,
+    isLoop,
+    isSeeking,
+    currentTime,
+    duration,
+    volume,
+    rate
+});
+
+export default reducers;
